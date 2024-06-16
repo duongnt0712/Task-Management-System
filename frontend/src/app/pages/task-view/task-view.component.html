@@ -1,0 +1,60 @@
+<nz-page-header nzTitle="TASKS" nzSubtitle="List 1"></nz-page-header>
+<nz-divider></nz-divider>
+<nz-card>
+  <div nz-row>
+    <div nz-col nzSpan="1">
+      <button nz-button nzSize="large" nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu4">
+        Status
+        <span nz-icon nzType="down" nzTheme="outline"></span>
+      </button>
+      <nz-dropdown-menu #menu4="nzDropdownMenu">
+        <ul nz-menu>
+          <li nz-menu-item><nz-tag nzColor="default">Pending</nz-tag></li>
+          <li nz-menu-item><nz-tag nzColor="success">Completed</nz-tag></li>
+        </ul>
+      </nz-dropdown-menu>
+    </div>
+    <div nz-col nzSpan="23">
+      <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton">
+        <input type="text" nz-input placeholder="Search by Title or Description" />
+      </nz-input-group>
+      <ng-template #suffixButton>
+        <button nz-button nzType="primary" nzSize="large" nzSearch><span nz-icon nzType="search" nzTheme="outline"></span>Search</button>
+      </ng-template>
+    </div>
+  </div>
+</nz-card>
+<br>
+<nz-table [nzData]="listOfData" [nzFrontPagination]="false" [nzShowPagination]="false">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Due Date</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+    <tr *ngFor="let data of listOfData" cdkDrag>
+      <td><i nz-icon nzType="column-height" nzTheme="outline"></i></td>
+      <td>
+        <div *ngIf="data.status == 'Completed'; else pendingStatus">
+          <label nz-checkbox [ngModel]="true"><del>{{data.title}}</del></label>
+        </div>
+        <ng-template #pendingStatus>
+          <label nz-checkbox [ngModel]="false">{{data.title}}</label>
+        </ng-template>
+      </td>
+      <td>{{data.description}}</td>
+      <td>{{data.dueDate}}</td>
+      <td><nz-tag [nzColor]="data.status == 'Completed' ? 'success' : 'default'">{{data.status}}</nz-tag></td>
+      <!-- <td>
+        <a>Action 一 {{data.name}}</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a>Delete</a>
+      </td> -->
+    </tr>
+  </tbody>
+</nz-table>
+
