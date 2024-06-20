@@ -15,6 +15,10 @@ export class TaskService {
     return this.webReqService.get<List[]>('lists');
   }
 
+  getList(id: string): Observable<List> {
+    return this.webReqService.get<List>(`lists/${id}`);
+  }
+
   createList(title: string): Observable<List> {
     // We want to send a web request to create a list
     return this.webReqService.post<List>('lists', { title });
@@ -33,9 +37,9 @@ export class TaskService {
     return this.webReqService.get<Task[]>(`lists/${listId}/tasks`);
   }
 
-  createTask(title: string, listId: string) {
+  createTask(task: Task, listId: string): Observable<Task> {
     // We want to send a web request to create a task
-    return this.webReqService.post(`lists/${listId}/tasks`, { title });
+    return this.webReqService.post<Task>(`lists/${listId}/tasks`, task);
   }
 
   updateTask(listId: string, taskId: string, title: string) {

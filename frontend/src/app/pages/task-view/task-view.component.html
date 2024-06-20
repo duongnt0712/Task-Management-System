@@ -1,4 +1,4 @@
-<nz-page-header nzTitle="TASKS" nzSubtitle="List 1">
+<nz-page-header nzTitle="TASKS" [nzSubtitle]="">
   <nz-page-header-extra>
     <button nz-button nzType="primary" (click)="openNewTask()"><i nz-icon nzType="plus-circle" nzTheme="outline"></i>Create New Task</button>
     <button nz-button nz-dropdown [nzDropdownMenu]="listSetting" [nzPlacement]="'bottomRight'"><i nz-icon nzType="setting" nzTheme="outline"></i></button>
@@ -39,10 +39,10 @@
     <nz-tag [nzColor]="task.status == true ? 'success' : 'default'">{{task.status == true ? 'Completed' : 'Pending'}}</nz-tag>
     <ul nz-list-item-actions>
       <nz-list-item-action ><a (click)="openEditTask()"><i nz-icon nzType="edit" nzTheme="outline" [nzTheme]="'twotone'" class="me-2"></i></a></nz-list-item-action>
-      <nz-list-item-action><a ><i nz-icon nzType="delete" nzTheme="outline" [nzTheme]="'twotone'" [nzTwotoneColor]="'#ff4d4f'" class="me-2"></i></a></nz-list-item-action>
+      <nz-list-item-action><a (click)="deleteTask(task._id)"><i nz-icon nzType="delete" nzTheme="outline" [nzTheme]="'twotone'" [nzTwotoneColor]="'#ff4d4f'" class="me-2"></i></a></nz-list-item-action>
     </ul>
   </nz-list-item>
-  <nz-list-empty *ngIf="tasks.length === 0"></nz-list-empty>
+  <nz-list-empty *ngIf="tasks?.length == 0"></nz-list-empty>
 </nz-list>
 
 <nz-drawer
@@ -67,11 +67,11 @@
   [nzVisible]="isVisibleEditTask"
   [nzWidth]="400"
   nzPlacement="right"
-  nzTitle="Edit Task"
-  (nzOnClose)="cancelEditTask()"
+  nzTitle="Create Task"
+  (nzOnClose)="cancelCreateTask()"
 >
   <ng-container *nzDrawerContent>
-    <form nz-form [formGroup]="validateEditTaskForm" (ngSubmit)="submitFormEditTask()">
+    <form nz-form [formGroup]="validateCreateTaskForm">
       <nz-form-item>
         <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="title">Title</nz-form-label>
         <nz-form-control nzErrorTip="Please input your Title!">
@@ -90,10 +90,10 @@
           <input type="text" nz-input formControlName="dueDate" placeholder="Due Date" />
         </nz-form-control>
       </nz-form-item>
+      <div class="buttons is-right mt-2">
+        <button nz-button (click)="cancelCreateTask()" class="me-2">Cancel</button>
+        <button nz-button nzType="primary" (click)="submitFormCreateTask()">Create</button>
+      </div>
     </form>
-    <div class="buttons is-right mt-2">
-      <button nz-button (click)="cancelEditTask()" class="me-2">Cancel</button>
-      <button nz-button nzType="primary" (click)="submitFormEditTask()">Update</button>
-    </div>
   </ng-container>
 </nz-drawer>

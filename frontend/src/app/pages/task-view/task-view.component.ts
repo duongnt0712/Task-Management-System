@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TaskService } from 'src/app/core/services/task/task.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Task } from 'src/app/core/model/task.model';
+import { List } from 'src/app/core/model/list.model';
 
 @Component({
   selector: 'app-task-view',
@@ -14,33 +15,19 @@ export class TaskViewComponent implements OnInit {
   isVisibleNewTask = false;
   isVisibleEditList = false;
   isVisibleEditTask = false;
+  validateCreateTaskForm!: FormGroup;
   validateEditTaskForm!: FormGroup;
-  selectedListId!: string
+  listId!: string
   tasks!: Task[];
-
-  data = [
-    'Racing car sprays burning fuel into crowd.',
-    'Japanese princess to wed commoner.',
-    'Australian walks 100km after outback crash.',
-    'Man charged over missing wedding girl.',
-    'Los Angeles battles huge wildfires.'
-  ];
-
-  checked = true;
+  list!: List;
 
   constructor(private fb: FormBuilder, private taskService: TaskService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
-    this.validateEditTaskForm = this.fb.group({
-      title: [null, [Validators.required ]],
-      description: [null, [Validators.required]],
-      dueDate: [null, [Validators.required]],
-    });
-
     this.route.params.subscribe(
       (params: Params) => {
         if (params.listId) {
-          this.selectedListId = params.listId;
+          this.listId = params.listId;
           this.taskService.getTasks(params.listId).subscribe((tasks: Task[]) => {
             this.tasks = tasks;
           })
@@ -49,6 +36,16 @@ export class TaskViewComponent implements OnInit {
         }
       }
     )
+
+    this.taskService.getList(this.listId).subscribe((list: List) => {
+      this.list = list;
+    })
+
+    this.validateCreateTaskForm = this.fb.group({
+      title: [null, [Validators.required ]],
+      description: [null, [Validators.required]],
+      dueDate: [null, [Validators.required]],
+    });
   }
 
   drop(event: CdkDragDrop<string[]>): void {
@@ -71,7 +68,7 @@ export class TaskViewComponent implements OnInit {
     this.isVisibleEditTask = true;
   }
 
-  cancelEditTask(): void {
+  cancelCreateTask(): void {
     this.isVisibleEditTask = false;
   }
 
@@ -79,17 +76,34 @@ export class TaskViewComponent implements OnInit {
 
   }
 
-  submitFormEditTask() {
-    if (this.validateEditTaskForm.valid) {
-      console.log('submit', this.validateEditTaskForm.value);
+  submitFormCreateTask() {
+    if (this.validateCreateTaskForm.valid) {
+      const createInfo = {
+        ...this.validateCreateTaskForm.value,
+      }
+      this.createTask(createInfo);
     } else {
-      Object.values(this.validateEditTaskForm.controls).forEach(control => {
+      Object.values(this.validateCreateTaskForm.controls).forEach(control => {
         if (control.invalid) {
           control.markAsDirty();
           control.updateValueAndValidity({ onlySelf: true });
         }
       });
     }
+  }
+
+  createTask(task: Task) {
+    this.taskService.createTask(task, this.listId).subscribe((newTask: Task) => {
+      console.log(newTask);
+      this.router.navigate([this.router.url]);
+    })
+  }
+
+  deleteTask(id: string) {
+    this.taskService.deleteTask(this.listId, id).subscribe((res: any) => {
+      this.tasks = this.tasks.filter(val => val._id !== id);
+      console.log(res);
+    })
   }
 
 }
