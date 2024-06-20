@@ -1,21 +1,12 @@
 import { NgModule } from '@angular/core';
-import { NZ_ICONS, NzIconModule } from 'ng-zorro-antd/icon';
-
-import {
-  MenuFoldOutline,
-  MenuUnfoldOutline,
-  FormOutline,
-  DashboardOutline
-} from '@ant-design/icons-angular/icons';
-
-const icons = [MenuFoldOutline, MenuUnfoldOutline, DashboardOutline, FormOutline];
+import { IconModule, IconService } from '@ant-design/icons-angular';
 
 @NgModule({
-  imports: [NzIconModule],
-  exports: [NzIconModule],
-  providers: [
-    { provide: NZ_ICONS, useValue: icons }
-  ]
+  imports: [IconModule],
+  exports: [IconModule],
 })
 export class IconsProviderModule {
+  constructor(private iconService: IconService) {
+    this.iconService.useJsonpLoading();
+  }
 }

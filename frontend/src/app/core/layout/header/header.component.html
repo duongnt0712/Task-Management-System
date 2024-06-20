@@ -1,0 +1,46 @@
+<nz-header nzTheme="light">
+  <div class="app-header">
+    <div nz-row [nzJustify]="'space-between'" [nzAlign]="'middle'">
+      <ng-container>
+        <div class="sidebar-logo" *ngIf="!isLoggedIn">
+          <a href="/login" target="_self">
+            <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo">
+          </a>
+        </div>
+        <span class="header-trigger" (click)="toggleMenu()" *ngIf="isLoggedIn">
+          <i class="trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></i>
+        </span>
+      </ng-container>
+      <ng-container *ngIf="isLoggedIn; else loginTemplate" >
+        <ng-container>
+          <div nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu">
+            <!-- <span> {{ user.email }} </span> -->
+            <nz-avatar nzIcon="user"></nz-avatar>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</nz-header>
+
+<ng-template #loginTemplate>
+  <div nz-row>
+    <button (click)="login()" nz-button nzType="primary" class="me-2" routerLink="/login">
+        <i nz-icon nzType="login"></i>Login
+    </button>
+    <button (click)="signup()" nz-button routerLink="/signup">
+      <i nz-icon nzType="user-add" nzTheme="outline"></i>Signup
+    </button>
+  </div>
+</ng-template>
+
+<nz-dropdown-menu #menu="nzDropdownMenu">
+  <ul nz-menu nzSelectable>
+    <li nz-menu-item nzMatchRouter routerLink="./profile">
+      <i nz-icon nzType="user" nzTheme="outline"></i>Profile
+    </li>
+    <li nz-menu-item nzMatchRouter nzDanger (click)="logout()">
+      <i nz-icon nzType="logout" nzTheme="outline"></i>Logout
+    </li>
+  </ul>
+</nz-dropdown-menu>

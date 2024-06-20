@@ -1,0 +1,57 @@
+<nz-layout class="app-layout">
+  <nz-sider class="menu-sidebar"
+            nzCollapsible
+            nzWidth="256px"
+            nzBreakpoint="md"
+            [(nzCollapsed)]="isCollapsed"
+            [nzTrigger]="null">
+    <div class="sidebar-logo">
+      <a href="/task-management/home" target="_self">
+        <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo">
+        <h1>Task Management App</h1>
+      </a>
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+      <li nz-menu-item nzMatchRouter>
+        <a nz-typography nzEllipsis routerLink="/task-management/home">
+          <i nz-icon nzType="home" nzTheme="outline"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li nz-menu-group>
+        <ul>
+          <li nz-menu-item nzMatchRouter *ngFor="let list of lists" [routerLink]="['/task-management/lists', list._id]">
+            <a nz-typography nzEllipsis>
+              <i nz-icon nzType="ordered-list" nzTheme="outline"></i>
+              <span>{{ list.title }}</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <button class="btn-bottom" nz-button nzType="primary" nzBlock (click)="open()"><i nz-icon nzType="plus-circle" nzTheme="outline"></i><span *ngIf="!isCollapsed">New List</span></button>
+    <nz-drawer
+      [nzVisible]="visible"
+      [nzWidth]="400"
+      nzPlacement="right"
+      nzTitle="Create New List"
+      (nzOnClose)="close()"
+    >
+      <ng-container *nzDrawerContent>
+        <input #listTitleInput nz-input placeholder="Enter list name..." />
+        <div class="buttons is-right mt-2">
+          <button nz-button (click)="close()" class="me-2">Cancel</button>
+          <button nz-button nzType="primary" (click)="createList(listTitleInput.value)">Create</button>
+        </div>
+      </ng-container>
+    </nz-drawer>
+  </nz-sider>
+  <nz-layout>
+    <app-header [isCollapsed]="isCollapsed" (isCollapsedChange)="toggleMenu($event)"></app-header>
+    <nz-content>
+      <div class="inner-content">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

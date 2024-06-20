@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+.mt-2 {
+  margin-top: 16px;
+}
+
+.mb-2 {
+  margin-bottom: 16px;
+}
+
+.me-2 {
+  margin-right: 16px;
+}
+
+.is-right {
+  display: flex;
+  justify-content: end;
+}

@@ -1,21 +1,26 @@
-<nz-page-header nzTitle="TASKS" nzSubtitle="List 1"></nz-page-header>
+<nz-page-header nzTitle="TASKS" nzSubtitle="List 1">
+  <nz-page-header-extra>
+    <button nz-button nzType="primary" (click)="openNewTask()"><i nz-icon nzType="plus-circle" nzTheme="outline"></i>Create New Task</button>
+    <button nz-button nz-dropdown [nzDropdownMenu]="listSetting" [nzPlacement]="'bottomRight'"><i nz-icon nzType="setting" nzTheme="outline"></i></button>
+    <nz-dropdown-menu #listSetting="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item (click)="openEditList()"><i nz-icon nzType="edit" nzTheme="outline" class="me-2"></i>Edit</li>
+        <li nz-menu-item nzDanger><i nz-icon nzType="delete" nzTheme="outline" class="me-2"></i>Delete</li>
+      </ul>
+    </nz-dropdown-menu>
+  </nz-page-header-extra>
+</nz-page-header>
 <nz-divider></nz-divider>
-<nz-card>
+<nz-card class="mb-2">
   <div nz-row>
-    <div nz-col nzSpan="1">
-      <button nz-button nzSize="large" nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu4">
-        Status
-        <span nz-icon nzType="down" nzTheme="outline"></span>
-      </button>
-      <nz-dropdown-menu #menu4="nzDropdownMenu">
-        <ul nz-menu>
-          <li nz-menu-item><nz-tag nzColor="default">Pending</nz-tag></li>
-          <li nz-menu-item><nz-tag nzColor="success">Completed</nz-tag></li>
-        </ul>
-      </nz-dropdown-menu>
+    <div nz-col nzSpan="2">
+      <nz-select nzAllowClear nzPlaceHolder="Filter Status">
+        <nz-option nzValue="Pending" nzLabel="Pending"><nz-tag nzColor="default">Pending</nz-tag></nz-option>
+        <nz-option nzValue="Completed" nzLabel="Completed"><nz-tag nzColor="success">Completed</nz-tag></nz-option>
+      </nz-select>
     </div>
-    <div nz-col nzSpan="23">
-      <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton">
+    <div nz-col nzSpan="22">
+      <nz-input-group nzSearch [nzAddOnAfter]="suffixButton">
         <input type="text" nz-input placeholder="Search by Title or Description" />
       </nz-input-group>
       <ng-template #suffixButton>
@@ -24,37 +29,71 @@
     </div>
   </div>
 </nz-card>
-<br>
-<nz-table [nzData]="listOfData" [nzFrontPagination]="false" [nzShowPagination]="false">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Title</th>
-      <th>Description</th>
-      <th>Due Date</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody cdkDropList (cdkDropListDropped)="drop($event)">
-    <tr *ngFor="let data of listOfData" cdkDrag>
-      <td><i nz-icon nzType="column-height" nzTheme="outline"></i></td>
-      <td>
-        <div *ngIf="data.status == 'Completed'; else pendingStatus">
-          <label nz-checkbox [ngModel]="true"><del>{{data.title}}</del></label>
-        </div>
-        <ng-template #pendingStatus>
-          <label nz-checkbox [ngModel]="false">{{data.title}}</label>
-        </ng-template>
-      </td>
-      <td>{{data.description}}</td>
-      <td>{{data.dueDate}}</td>
-      <td><nz-tag [nzColor]="data.status == 'Completed' ? 'success' : 'default'">{{data.status}}</nz-tag></td>
-      <!-- <td>
-        <a>Action 一 {{data.name}}</a>
-        <nz-divider nzType="vertical"></nz-divider>
-        <a>Delete</a>
-      </td> -->
-    </tr>
-  </tbody>
-</nz-table>
+<nz-list nzBordered nzHeader="List" nzFooter="" cdkDropList (cdkDropListDropped)="drop($event)">
+  <nz-list-item *ngFor="let task of tasks" cdkDrag>
+    <nz-list-item-meta [nzDescription]="task.description">
+      <nz-list-item-meta-title>
+        <a href="">{{ task.title }}</a>
+      </nz-list-item-meta-title>
+    </nz-list-item-meta>
+    <nz-tag [nzColor]="task.status == true ? 'success' : 'default'">{{task.status == true ? 'Completed' : 'Pending'}}</nz-tag>
+    <ul nz-list-item-actions>
+      <nz-list-item-action ><a (click)="openEditTask()"><i nz-icon nzType="edit" nzTheme="outline" [nzTheme]="'twotone'" class="me-2"></i></a></nz-list-item-action>
+      <nz-list-item-action><a ><i nz-icon nzType="delete" nzTheme="outline" [nzTheme]="'twotone'" [nzTwotoneColor]="'#ff4d4f'" class="me-2"></i></a></nz-list-item-action>
+    </ul>
+  </nz-list-item>
+  <nz-list-empty *ngIf="tasks.length === 0"></nz-list-empty>
+</nz-list>
 
+<nz-drawer
+  [nzClosable]="false"
+  [nzVisible]="isVisibleEditList"
+  [nzWidth]="400"
+  nzPlacement="right"
+  nzTitle="Edit List"
+  (nzOnClose)="cancelEditList()"
+>
+  <ng-container *nzDrawerContent>
+    <input #listTitleInput nz-input placeholder="Enter list name..." />
+    <div class="buttons is-right mt-2">
+      <button nz-button (click)="cancelEditList()" class="me-2">Cancel</button>
+      <button nz-button nzType="primary" (click)="editList()">Update</button>
+    </div>
+  </ng-container>
+</nz-drawer>
+
+<nz-drawer
+  [nzClosable]="false"
+  [nzVisible]="isVisibleEditTask"
+  [nzWidth]="400"
+  nzPlacement="right"
+  nzTitle="Edit Task"
+  (nzOnClose)="cancelEditTask()"
+>
+  <ng-container *nzDrawerContent>
+    <form nz-form [formGroup]="validateEditTaskForm" (ngSubmit)="submitFormEditTask()">
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="title">Title</nz-form-label>
+        <nz-form-control nzErrorTip="Please input your Title!">
+          <input type="text" nz-input formControlName="title" placeholder="Title" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="description">Description</nz-form-label>
+        <nz-form-control nzErrorTip="Please input your Description!">
+          <input type="text" nz-input formControlName="description" placeholder="Description" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="dueDate">Due Date</nz-form-label>
+        <nz-form-control nzErrorTip="Please input your Due Date!">
+          <input type="text" nz-input formControlName="dueDate" placeholder="Due Date" />
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+    <div class="buttons is-right mt-2">
+      <button nz-button (click)="cancelEditTask()" class="me-2">Cancel</button>
+      <button nz-button nzType="primary" (click)="submitFormEditTask()">Update</button>
+    </div>
+  </ng-container>
+</nz-drawer>
